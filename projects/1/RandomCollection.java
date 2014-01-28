@@ -1,4 +1,8 @@
 public class RandomCollection() <Item> {
+
+  private int size = 0;
+  private boolean isEmpty = true;
+
   public RandomCollection();
   public boolean isEmpty();
   public int size();
