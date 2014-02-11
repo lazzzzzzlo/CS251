@@ -2,6 +2,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class Stack<Item> implements Iterable<Item> {
+
   private int N;
   private Node<Item> first;
 
@@ -22,6 +23,7 @@ public class Stack<Item> implements Iterable<Item> {
   public int size() { 
     return N; 
   }
+
   public void push(Item item) {
     Node<Item> oldfirst = first;
     first = new Node<Item>();
@@ -29,6 +31,7 @@ public class Stack<Item> implements Iterable<Item> {
     first.next = oldfirst;
     N++;
   }
+
   public Item pop() { 
     if (isEmpty())
       throw new NoSuchElementException("Stack underflow");
@@ -37,6 +40,7 @@ public class Stack<Item> implements Iterable<Item> {
     N--;
     return item;
   }
+
   public Item peek() {
     if (isEmpty()) throw new NoSuchElementException("Stack underflow");
     return first.item;
@@ -79,5 +83,4 @@ public class Stack<Item> implements Iterable<Item> {
     }
     StdOut.println("(" + s.size() + " left on stack)");
   }
-
 }
