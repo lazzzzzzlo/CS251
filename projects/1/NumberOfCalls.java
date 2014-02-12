@@ -1,3 +1,7 @@
+import java.io.PrintWriter;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+
 public class NumberOfCalls {
 
   private static RandomCollection<Integer> instantiate(int n) {
@@ -29,17 +33,18 @@ public class NumberOfCalls {
     return numCallout;
   }
 
-  public static void main(String args[]) {
+  public static void main(String args[]) throws FileNotFoundException, UnsupportedEncodingException {
 
-    int i;
+    PrintWriter writer = new PrintWriter("out.txt", "UTF-8");
     int numCalls = 0;
-    while(!StdIn.isEmpty()) {
+    for(int i = 1; i <= 200; i++) {
       numCalls = 0;
-      RandomCollection<Integer> randCol = instantiate(StdIn.readInt());
-      for(i = 0; i < 100000; i++) {
+      RandomCollection<Integer> randCol = instantiate(i);
+      for(int j = 0; j < 100000; j++) {
         numCalls += getNumberOfCallsForComprehensiveCallout(randCol, randCol.size());
       }
-      StdOut.println((double) numCalls/100000);
+      writer.println("" + i + "," +(double) numCalls/100000);
     }
+    writer.close();
   }
 }
