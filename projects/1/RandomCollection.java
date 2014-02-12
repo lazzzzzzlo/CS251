@@ -1,4 +1,3 @@
-import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
@@ -15,14 +14,14 @@ public class RandomCollection<Item> {
     return N == 0;
   }
 
-  private void resize(int capacity) { //sample resize from the book
+  private void resize(int capacity) { //sample resize
     assert capacity >= N;
     Item[] temp = (Item[]) new Object[capacity];
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++)
       temp[i] = a[i];
-    }
     a = temp;
   }
+
 
   public int size() {
     return N;
@@ -39,9 +38,9 @@ public class RandomCollection<Item> {
     if (isEmpty()) 
       throw new NoSuchElementException("Stack underflow");
     Item item = a[i];
-    a[i] = null;
+    a[i] = a[N-1]; //discard returned element
     N--;
-    if (N > 0 && N == a.length/4) 
+    if (N > 0 && N == a.length/4) //resize if necessary
       resize(a.length/2);
     return item;
   }
@@ -49,6 +48,13 @@ public class RandomCollection<Item> {
   public Item callout() { //gets element randomly in O(1)
     int i = StdRandom.uniform(N);
     return a[i];
+  }
+
+  public String toString() { 
+    StringBuilder s = new StringBuilder(); 
+    for(int i = 0; i < N;i++) 
+      s.append(a[i] + ","); 
+    return s.toString().substring(0, s.length() - 1); //remove last comma 
   }
 
   public static void main(String [] args) {
