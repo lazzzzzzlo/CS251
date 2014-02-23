@@ -1,14 +1,22 @@
 public class SlowConvexHull {
 
+  private Point2D[] pointSet;
+  private int numPoints;
+
   //Create an empty point set that can accommodate n points
   public SlowConvexHull(int n) {
-
+    pointSet = new Point2D[n];
+    numPoints = 0;
   }
 
+  //Return current number of points
+  private int size() {
+    return numPoints;
+  }
 
   // Add a point P(x,y) to the point set.
   public void add(double x, double y) {
-
+    pointSet[numPoints++] = new Point2D(x, y);
   }
 
   /* Indicate on which side of the line passing through (x0,y0) 
