@@ -1,6 +1,7 @@
 public class SlowConvexHull {
 
   private Point2D[] pointSet;
+  private Point2D[] convexHull;
   private int numPoints;
 
   //Create an empty point set that can accommodate n points
@@ -9,22 +10,29 @@ public class SlowConvexHull {
     numPoints = 0;
   }
 
-  //Return current number of points
-  private int getNumPoints() {
-    return numPoints;
-  }
+  //read points from StdIn and add them to the point set
+  private void populatePointSet() {
 
-  //return point set
-  private Point2D [] getPointSet() {
+    double x, y;
 
-    return pointSet;
-  
+    while(!StdIn.isEmpty()) {
+
+      x = StdIn.readDouble();
+      y = StdIn.readDouble();
+      this.add(x,y);
+    }
   }
 
   //print point set
   private void printPointSet() {
     for(int i = 0; i < numPoints; i++)
       StdOut.println(this.pointSet[i].toString());
+  }
+
+  //print the convex hull formed by the point set
+  private void printConvexHull() {
+    for(int i = 0; i < convexHull.size(); i++) 
+      StdOut.println("" + i + this.convexHull[i].toString());
   }
 
   // Add a point P(x,y) to the point set.
@@ -44,17 +52,8 @@ public class SlowConvexHull {
 
   }
 
-  //read points from StdIn and add them to the point set
-  private void populatePointSet() {
+  private void findConvexHull() {
 
-    double x, y;
-
-    while(!StdIn.isEmpty()) {
-
-      x = StdIn.readDouble();
-      y = StdIn.readDouble();
-      this.add(x,y);
-    }
   }
 
   public static void main(String[] args) {
