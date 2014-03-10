@@ -68,7 +68,6 @@ public class FastConvexHull {
       int i = 0;
       for(ArrayList<Point2D> list : convexHullList)
         for(Point2D point : list) {
-          //StdOut.println(Arrays.binarySearch(pointSet, point, new Point2DComparator()) + " " + point.x() + " " + point.y());
           StdOut.println(i + " " + point.x() + " " + point.y());
           i++;
         }

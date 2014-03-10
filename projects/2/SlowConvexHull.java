@@ -85,10 +85,10 @@ public class SlowConvexHull {
           if (k == i && k == j)
             continue;
           Point2D p3 = pointSet[k];
-          if (whichSide(p1.x(), p1.y(), p2.x(), p2.y(), p3.x(), p3.y()) == 1)
+          if (whichSide(p1.x(), p1.y(), p2.x(), p2.y(), p3.x(), p3.y()) >= 1)
             count++;
         }
-        if (count == numPoints -2) {
+        if (count == numPoints-2) {
           addToConvexSet(p1.x(), p1.y());
           addToConvexSet(p2.x(), p2.y());
           break;
