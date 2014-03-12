@@ -4,17 +4,18 @@ import java.util.Comparator;
 
 public class FastConvexHull {
 
-  private Point2D[] pointSet;
-  private ArrayList<ArrayList<Point2D>> convexHullList;
+  private Point2DWithIndex[] pointSet;
+  private ArrayList<ArrayList<Point2DWithIndex>> convexHullList;
+  private Point2DWithIndex [] hullArray;
   private int numPoints;
 
   //Create an empty point set that can accommodate n points
   public FastConvexHull(int n) {
-    pointSet = new Point2D[n];
-    convexHullList = new ArrayList<ArrayList<Point2D>>(2);
+    pointSet = new Point2DWithIndex[n];
+    convexHullList = new ArrayList<ArrayList<Point2DWithIndex>>(2);
   }
 
-  //custom comparator
+  //comparator to sort lexicographically
   class Point2DComparator implements Comparator<Point2D> {
     @Override
     public int compare(Point2D p, Point2D q) { //compare by pattern matching
@@ -26,13 +27,29 @@ public class FastConvexHull {
     }
   }
 
+  //comparator to sort by index
+  class Point2DWithIndexComparator implements Comparator<Point2DWithIndex> {
+    @Override
+    public int compare(Point2DWithIndex p, Point2DWithIndex q) { //compare by pattern matching
+      return (p.i() - q.i() > 0) ? 1 : -1;
+    }
+  }
+
   //Getters
-  public Point2D[] getPointSet() { return this.pointSet; }
-  public ArrayList<ArrayList<Point2D>> getConvexHullList() { return this.convexHullList; }
+  public Point2DWithIndex[] getPointSet() { return this.pointSet; }
+  public ArrayList<ArrayList<Point2DWithIndex>> getConvexHullList() { return this.convexHullList; }
+  public Point2DWithIndex[] getHullArray() { return this.hullArray; }
+
+  public int getNumEdges() {
+    if (this.convexHullList.get(0) == null)
+      return 0;
+    return this.convexHullList.get(0).size() + this.convexHullList.get(1).size();
+  }
 
   //read points from StdIn and add them to the point set
   public void populatePointSet() {
 
+    int i;
     double x, y;
 
     while(!StdIn.isEmpty()) {
@@ -52,31 +69,46 @@ public class FastConvexHull {
         StdOut.println(this.pointSet[i].toString());
     }
   }
-
-  //get number of edges of the convex hull
-  public int getNumEdges() {
-    if (this.convexHullList.get(0) == null)
-      return 0;
-    return this.convexHullList.get(0).size() + this.convexHullList.get(1).size();
-  }
-
-  //print the convex hull formed by the point set
-  private void printConvexHull() {
-    if (this.getNumEdges() == 0)
-      StdOut.println("Convex hull is currently empty");
-    else {
-      int i = 0;
-      for(ArrayList<Point2D> list : convexHullList)
-        for(Point2D point : list) {
-          StdOut.println(i + " " + point.x() + " " + point.y());
+  //sort convex hull by index
+  public void initializeHullArray(ArrayList<ArrayList<Point2DWithIndex>> convexHullList) {
+    hullArray = new Point2DWithIndex[this.getNumEdges()];
+    int i = 0;
+    for(ArrayList<Point2DWithIndex> list : convexHullList) {
+        for(Point2DWithIndex point : list) {
+          hullArray[i] = point;
           i++;
         }
     }
   }
 
+  //get smallest index in hull array
+  public int getMinIndex() {
+    int min = Integer.MAX_VALUE;
+    int minI = -1;
+    for(int i = 0; i < hullArray.length; i++) {
+      Point2DWithIndex p = hullArray[i];
+      if (p.i() < min) {
+        min = p.i();
+        minI = i;
+      }
+    }
+    return minI;
+  }
+
+  //print the convex hull formed by the point set
+  private void printConvexHull() {
+    this.initializeHullArray(this.convexHullList);
+    int iMin = getMinIndex();
+    for(int i = 0; i < hullArray.length; i++) {
+      Point2DWithIndex p = hullArray[(i + iMin) % hullArray.length];
+      StdOut.println(p.i() + " " + p.x() + " " + p.y());
+    }
+  }
+
   // Add a point P(x,y) to the point set.
   public void add(double x, double y) {
-    pointSet[numPoints++] = new Point2D(x, y);
+    pointSet[numPoints] = new Point2DWithIndex(x, y, numPoints);
+    numPoints++;
   }
 
   /* Indicate on which side of the line passing through (x0,y0) 
@@ -87,7 +119,7 @@ public class FastConvexHull {
     Point2D p2 = new Point2D(x1,y1);
     Point2D p3 = new Point2D(x,y);
 
-    return Point2D.ccw(p1, p2, p3);
+    return -Point2D.ccw(p1, p2, p3);
   }
 
     //sort the point set by x coordinate, in case of a tie, use y
@@ -96,28 +128,33 @@ public class FastConvexHull {
   }
 
   public void findConvexHull() {
-    this.sortPointSet();
-    ArrayList<Point2D> lowerList = new ArrayList<Point2D>();
-    ArrayList<Point2D> upperList = new ArrayList<Point2D>();
+    sortPointSet();
+    ArrayList<Point2DWithIndex> lowerList = new ArrayList<Point2DWithIndex>();
+    lowerList.add(pointSet[0]);
+    lowerList.add(pointSet[1]);
 
-    for(int i = 0; i < numPoints; i++) {
+    for(int i = 2; i < numPoints; i++) {
       while(lowerList.size() >= 2 && (whichSide(lowerList.get(lowerList.size() - 1).x(),
                                               lowerList.get(lowerList.size() - 1).y(),
                                               lowerList.get(lowerList.size() - 2).x(),
                                               lowerList.get(lowerList.size() - 2).y(),
                                               pointSet[i].x(),
-                                              pointSet[i].y()) <= 0))
+                                              pointSet[i].y()) < 0))
         lowerList.remove(lowerList.size() - 1);  
       lowerList.add(pointSet[i]);
     }
 
-    for(int i = numPoints - 1; i > 0; i--) {
+    ArrayList<Point2DWithIndex> upperList = new ArrayList<Point2DWithIndex>();
+    upperList.add(pointSet[numPoints - 1]);
+    upperList.add(pointSet[numPoints - 2]);
+
+    for(int i = numPoints - 3; i > 0; i--) {
       while(upperList.size() >= 2 && (whichSide(upperList.get(upperList.size() - 1).x(), 
                                               upperList.get(upperList.size() - 1).y(),
                                               upperList.get(upperList.size() - 2).x(),
                                               upperList.get(upperList.size() - 2).y(),
                                               pointSet[i].x(),
-                                              pointSet[i].y()) <= 0))
+                                              pointSet[i].y()) < 0))
         upperList.remove(upperList.size() - 1);  
       upperList.add(pointSet[i]);
     }
@@ -125,8 +162,8 @@ public class FastConvexHull {
     lowerList.remove(lowerList.size()-1);
     upperList.remove(upperList.size()-1);
 
-    convexHullList.add(lowerList);
-    convexHullList.add(upperList);
+    this.convexHullList.add(lowerList);
+    this.convexHullList.add(upperList);
   }
 
   public static void main(String[] args) {

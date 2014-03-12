@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.ArrayList;
 
 public class ConvexHullVisualizer {
@@ -14,42 +15,28 @@ public class ConvexHullVisualizer {
       StdDraw.point(p.x(), p.y());
   }
 
-  //draw the convex hull
   public static void drawConvexHull(FastConvexHull convexHull) {
-
-    ArrayList<ArrayList<Point2D>> convexHullList = convexHull.getConvexHullList();
-    if (convexHull.getNumEdges() == 0)
-      StdOut.println("Convex hull is currently empty");
-    else {
-      ArrayList<Point2D> lowerList = convexHullList.get(0);
-      ArrayList<Point2D> upperList = convexHullList.get(1);
-      Point2D p1;
-      Point2D p2;
-
-      for(int i = 0; i < lowerList.size() - 1; i++) {
-        p1 = lowerList.get(i);
-        p2 = lowerList.get(i+1);
-        p1.drawTo(p2);
-      }
-      p1 = lowerList.get(lowerList.size() - 1);
-      p2 = upperList.get(0);
-      p1.drawTo(p2);
-      for(int i = 0; i < upperList.size() - 1; i++) {
-        p1 = upperList.get(i);
-        p2 = upperList.get(i+1);
-        p1.drawTo(p2);
-      }
-      p1 = upperList.get(upperList.size() - 1);
-      p2 = lowerList.get(0);
+    convexHull.initializeHullArray(convexHull.getConvexHullList());
+    Point2DWithIndex [] hullArray = convexHull.getHullArray();
+    int i;
+    int iMin = convexHull.getMinIndex();
+    Point2DWithIndex p1;
+    Point2DWithIndex p2;
+    for(i = 0; i < hullArray.length - 1; i++) {   
+      p1 = hullArray[(i + iMin) % hullArray.length];
+      p2 = hullArray[(i + 1 + iMin) % hullArray.length];
       p1.drawTo(p2);
     }
+    p1 = hullArray[(i + iMin) % hullArray.length];
+    p2 = hullArray[iMin % hullArray.length];
+    p1.drawTo(p2);
   }
-
   public static void main(String[] args) {
     FastConvexHull convexHull = new FastConvexHull(StdIn.readInt());
     convexHull.populatePointSet();
     drawPointSet(convexHull);
     convexHull.findConvexHull();
     drawConvexHull(convexHull);
+    StdDraw.save("500p.png");
   }
 }
