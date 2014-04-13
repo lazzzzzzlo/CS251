@@ -2,12 +2,13 @@
 #include <thread>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
+#include <unordered_map>
 #include "key.h"
 #include "symbol.h"
 
 using namespace std;
-
 
 int main(int argc, char *argv[]){
    
@@ -59,13 +60,22 @@ Key Symbol::decrypt(Key key){
     char **frst_pass_array = (char **) malloc(sizeof(char *)*frst_subset_size);
     char **snd_pass_array = (char **) malloc(sizeof(char *)*snd_subset_size);
 
-    printf("frst_subset_size: %d\tsnd_subset_size: %d\n", frst_subset_size, snd_subset_size);
-
     std::thread frst_thread(get_subset_sum, &frst_pass_array, C/2); //get subset sums
     std::thread snd_thread(get_subset_sum, &snd_pass_array, C - C/2); //get subset sums
 
     frst_thread.join();
     snd_thread.join();
+
+    /*Merge strings */
+    std::unordered_map<char *, char *> map;
+
+    for(int i = 0; i < frst_subset_size; i++) {
+        for(int j = 0; j < snd_subset_size; j++) {
+            char *password = (char *) malloc((C + 1)*sizeof(char));
+            strcat(password, frst_pass_array[i]);
+            strcat(password, snd_pass_array[j]);
+        }
+    }
 
     return decryptedKey;
 }

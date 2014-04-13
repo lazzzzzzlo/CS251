@@ -13,7 +13,7 @@
 // #define ALPHABET "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
 
-class Key{
+class Key {
   private:
 
     /* An extended precision base R integer consisting of C digits*/
