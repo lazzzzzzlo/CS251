@@ -9,6 +9,7 @@ class Symbol {
 
     public:
 	Symbol(char []);
+    Key get_encrypted();
 	void initializeTable();
         Key decrypt(Key);
 };

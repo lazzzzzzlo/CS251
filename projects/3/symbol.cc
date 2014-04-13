@@ -2,6 +2,7 @@
 #include <thread>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "key.h"
 #include "symbol.h"
 
@@ -19,6 +20,7 @@ int main(int argc, char *argv[]){
    symKey.initializeTable();
 
    //Add code here
+   symKey.decrypt(symKey.get_encrypted());
 }
 
 Symbol::Symbol(char s[]){
@@ -42,30 +44,28 @@ void Symbol::initializeTable(){
    }
 }
 
+Key Symbol::get_encrypted() {
+    return (encrypted);
+}
+
 void get_subset_sum(char ***pass_array, int length);
 
 Key Symbol::decrypt(Key key){
     Key decryptedKey;
 
-    int frst_subset_size = C/2; //floor(C/2) because of integer division
-    int snd_subset_size = C - frst_subset_size; //the rest of the partial password
+    int frst_subset_size = (int) pow(R, C/2); //size of alphabet raised to floor of C/2
+    int snd_subset_size = (int) pow(R, C - C/2); //the rest of the partial password
 
     char **frst_pass_array = (char **) malloc(sizeof(char *)*frst_subset_size);
     char **snd_pass_array = (char **) malloc(sizeof(char *)*snd_subset_size);
 
-    std::thread frst_thread(get_subset_sum, &frst_pass_array, frst_subset_size); //get subset sums
-    std::thread snd_thread(get_subset_sum, &snd_pass_array, snd_subset_size); //get subset sums
+    printf("frst_subset_size: %d\tsnd_subset_size: %d\n", frst_subset_size, snd_subset_size);
+
+    std::thread frst_thread(get_subset_sum, &frst_pass_array, C/2); //get subset sums
+    std::thread snd_thread(get_subset_sum, &snd_pass_array, C - C/2); //get subset sums
 
     frst_thread.join();
     snd_thread.join();
-
-    for(int i = 0; i < frst_subset_size; i++)
-        printf("%s\n", frst_pass_array[i]);
-
-    printf("\n\n\n");
-
-    for(int i = 0; i < snd_subset_size; i++)
-        printf("%s\n", snd_pass_array[i]);
 
     return decryptedKey;
 }
