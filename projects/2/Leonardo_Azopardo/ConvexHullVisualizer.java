@@ -17,7 +17,7 @@ public class ConvexHullVisualizer {
   //draw the convex hull
   public static void drawConvexHull(FastConvexHull convexHull) {
 
-    ArrayList<ArrayList<Point2D>> convexHullList = convexHull.getConvexHullList();
+    ArrayList<ArrayList<Point2DWithIndex>> convexHullList = convexHull.getConvexHullList();
     if (convexHull.getNumEdges() == 0)
       StdOut.println("Convex hull is currently empty");
     else {
