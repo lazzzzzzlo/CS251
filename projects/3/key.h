@@ -1,7 +1,7 @@
 #ifndef KEY_H
 #define KEY_H
 
-#define C 8
+#define C 4
 
 #define B 5          // number of bits per character
 #define R (1 << B)   // size of alphabet (32)

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <map>
 #include <unordered_map>
 #include "key.h"
 #include "symbol.h"
@@ -51,8 +52,9 @@ Key Symbol::get_encrypted() {
 
 void get_subset_sum(char ***pass_array, int length);
 
-Key Symbol::decrypt(Key key){
-    Key decryptedKey;
+Key Symbol::decrypt(Key key) {
+
+    Key tempKey;
 
     int frst_subset_size = (int) pow(R, C/2); //size of alphabet raised to floor of C/2
     int snd_subset_size = (int) pow(R, C - C/2); //the rest of the partial password
@@ -67,17 +69,20 @@ Key Symbol::decrypt(Key key){
     snd_thread.join();
 
     /*Merge strings */
-    std::unordered_map<char *, char *> map;
+    std::map<Key, char *, Key::keyGreaterThan> st;
 
     for(int i = 0; i < frst_subset_size; i++) {
         for(int j = 0; j < snd_subset_size; j++) {
             char *password = (char *) malloc((C + 1)*sizeof(char));
             strcat(password, frst_pass_array[i]);
             strcat(password, snd_pass_array[j]);
+            Key encrypted_key = Key(password);
+            const Key final_key = encrypted_key.keySubsetSum(T);
+            st[final_key] = password;
         }
     }
 
-    return decryptedKey;
+    return st[key];
 }
 
 void get_subset_sum(char ***pass_array, int length) {

@@ -69,19 +69,17 @@ bool Key::keyGreaterThan(Key a, Key b){
 
 // convert from char to integer 0-31
 void Key::keySetString(char s[]) {
-  int i, j;
-  for (i = 0; i < C; i++)
+    int i, j;
+    for (i = 0; i < C; i++)
     for (j = 0; j < R; j++)
       if (s[i] == ALPHABET[j])
         digit[i] = j;
 }
 
-
 void Key::keySet(Key a){
   int i;
   for(i = 0; i < C; i++)
     digit[i] = a.digit[i];
-
 }
 
 // c = a + b
@@ -107,5 +105,4 @@ Key Key::keySubsetSum(Key T[N])  {
     }
   return sum;   
 }
-
 
