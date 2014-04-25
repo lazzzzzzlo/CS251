@@ -1,0 +1,209 @@
+
+<!-- saved from url=(0047)https://www.cs.purdue.edu/homes/cs251/project4/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>CS25100: Data Structures and Algorithms, Project 4</title>
+<style type="text/css"></style></head>
+
+<body><h2>CS25100: Data Structures and Algorithms, Spring 2014</h2>
+<h2>Project 4, Graph Structure</h2>
+
+<hr>
+
+<h3>Description</h3>
+<p>
+This project includes three tasks: (1) finding shortest ancestral paths in a <em>directed</em> graph, (2) identifying edges connecting dense subgraphs in an <em>undirected</em> graph and computing the clustering coefficient of the undirected graph, and (3) identifying vertices with high "centrality" in a <em>directed</em> graph.
+
+<br>
+</p><p>
+Note that <tt>Digraph, EdgeWeightedDigraph, EdgeWeightedGraph, BreadthFirstDirectedPaths, DijkstraSP, PrimMST,</tt> and other graph data structures and algorithms are available to you. The implementation of these classes is provided with the textbook
+  (<a href="http://algs4.cs.princeton.edu/code/" click="">here</a>). 
+As with projects 1 and 2, you can download and use <a href="https://www.cs.purdue.edu/homes/cs251/project4/stdlib.jar">the standard library</a> and <a href="https://www.cs.purdue.edu/homes/cs251/project4/algs4.jar">algs4</a> jar files.
+
+
+</p><h3>Task 1: Shortest Ancestral Paths (25 points)</h3>
+
+An <em>ancestral path</em> between two vertices
+<em>v</em> and <em>w</em> in a digraph is a directed path from
+<em>v</em> to a common ancestor <em>x</em>, together with
+a directed path from <em>w</em> to the same ancestor <em>x</em>. 
+A <em>shortest ancestral path</em> is an ancestral path of minimum total length.
+For example, in the digraph on the left, the shortest ancestral path between
+3 and 11 has length 4 (with common ancestor 1).
+In the digraph on the right, one ancestral path between 1 and 5 has length 4
+(with common ancestor 5), but the shortest ancestral path has length 2
+(with common ancestor 0).
+
+<div style="text-align:center;"><img src="./CS25100  Data Structures and Algorithms, Project 4_files/wordnet-sap.png"></div>
+
+<p>
+For this task, implement an immutable data type <tt>SAP</tt> with the following API:
+
+</p><blockquote><pre>// constructor
+public SAP (Digraph G) // Use the Digraph implementation provided by the book
+
+// return length of shortest ancestral path of v and w; -1 if no such path
+public int length (int v, int w)
+
+// return a common ancestor of v and w that participates in a shortest ancestral path; -1 if no such path
+public int ancestor (int v, int w)
+</pre></blockquote>
+
+
+<p>
+Include a <tt>main()</tt> that takes the names of two files as command-line arguments:
+a digraph input file (standard format used by <tt>Digraph</tt>) and a digraph test input file.
+Your main will construct the digraph, read in vertex pairs from the test input file, and 
+print out the length of a shortest ancestral path between the two vertices
+and a common ancestor that participates in that path. Note that there can be more than one path
+with the same length; output the information corresponding to any of them.
+
+</p><p>
+
+Your implementation can be tested using the <tt>digraph*</tt> test cases in <a href="https://www.cs.purdue.edu/homes/cs251/project4/graphtests.zip">this zip file</a>.
+For example, digraph1.txt represents the graph on the left side of the previous figure.
+In this case the file specifies that the graph contains 13 vertices (first line), 11 edges (second line)
+and the rest of the lines enumerate the edges. The file digraph1.input contains 4 pairs of vertices
+and we want to test their shortest ancestral paths (length and ancestor). By running the command on the
+rightmost section we determine that the first three do have a SAP, while the 4th one does not (returning
+-1 to indicate this).
+
+</p><p>
+<b>Do not include extra output, other than what is indicated here (like debug prints). The format
+shown here must be precisely preserved:</b>
+
+<blockquote><pre>% <b>more digraph1.txt</b>          % <b>more digraph1.input</b>          % <b>java -classpath .:stdlib.jar SAP digraph1.txt digraph1.input</b>
+13                           3 11                           sap = 4, ancestor = 1
+11                           9 12                           sap = 3, ancestor = 5
+ 7  3                        7 2                            sap = 4, ancestor = 0
+ 8  3                        1 6                            sap = -1, ancestor = -1
+ 3  1                            
+ 4  1
+ 5  1                            
+ 9  5                            
+10  5
+11 10                            
+12 10                            
+ 1  0
+ 2  0
+</pre></blockquote><h3>Task 2: Edges Connecting Dense Subgraphs and Graph Clustering Coefficients (30 points)</h3>
+
+In social networks, nodes (vertices) tend to create tightly-knit groups (subgraphs) characterized by relatively high density ties (edges).
+The identification of dense (clustered) subgraphs in <em>undirected
+graphs</em> is an important problem. 
+Edges that connect these dense subgraphs are critical for graph connectivity and resilience to edge removal. Identifying such edges 
+has many applications in fault tolerance in computer networks, social networks, and biological networks.
+
+<p>
+For this task, create a program called <tt>CriticalEdges</tt> the does the following:
+
+</p><ol>
+<li>Read a graph from an input file passed on the command line. Read a positive integer <tt>N</tt> also from the command line.
+</li><li>Assign each edge a random weight in the range [0.0, 1.0)
+</li><li>Compute the minimum spanning tree (MST) for this graph.
+</li><li>Repeat Steps [2-3] fifty times.
+</li><li>For each edge in the graph, compute the number of times that it appeared in an MST.
+</li><li>Print the top <tt>N</tt> edges, i.e., that appeared in the largest number of MSTs (if the graph has fewer than <tt>N</tt> edges, print all). These are considered critical edges because they connect dense subgraphs.
+
+</li><li>Compute the clustering coefficient of the input graph. The clustering coefficient is defined as: for each vertex in the graph, the total number of edges connecting the vertices adjacent to that vertex, divided by the total number of possible edges among those vertices (for <em>n &gt; 1</em> vertices, that would be <em>n(n-1)/2</em>) The coefficient is zero for a vertex with &lt;= 1 adjacent vertices(we will not allow self-loops). We average this across all vertices in the graph. Graphs that have a high clustering coefficient are known as <em>small-world</em> graphs.
+</li></ol>
+
+Precisely follow the following format for your output (make sure each edge appears only once, i.e., if 7-8 appears 8-7 should not):
+<pre>% java -classpath .:stdlib.jar CriticalEdges starG.txt 3
+Top edges:
+Edge 0-11
+Edge 1-5
+Edge 2-7
+Clustering coefficient of graph: 0.583333
+</pre>
+
+The <a href="https://www.cs.purdue.edu/homes/cs251/project4/graphtests.zip">zip file</a> contains a few sample test undirected unweighted graphs named <tt>*G.txt</tt>.
+You may want to construct additional test cases.
+
+<h3>Task 3: Vertices with High Centrality (20 points)</h3>
+
+As with task 2, we aim to study graph structure, but here we focus on vertices that are <em>central</em> to a graph.
+<p>
+For this task, create a program called <tt>CriticalVertices</tt> that does the following: 
+
+</p><ol>
+<li>Read an edge-weighted digraph from an input file passed on the command line. You can assume non-negative link weights for all links. Read a positive integer <tt>N</tt> also from the command line.
+</li><li>Execute the shortest path algorithm from each vertex in the graph to each other vertex.
+</li><li>Compute the number of shortest paths that passed through each vertex, i.e., the number of times that the vertex appeared in the computed paths (not counting the endpoints of a path). Print the top <tt>N</tt> vertices (if the graph has fewer than <tt>N</tt> vertices, print all). These are considered critical to connecting communities because they have high "betweenness centrality."
+</li><li>Compute the sum of distances from each vertex to all other vertices in the graph. Print the <tt>N</tt> vertices with the lowest sums.
+These vertices are considered to have the highest "closeness centrality." Closeness can be regarded as a measure of influence in a social network (vertices that can quickly reach all others).
+
+</li></ol>
+Here is an example of the output format you need to precisely follow:
+<pre>% java -classpath .:stdlib.jar CriticalVertices tinyEWD.txt 3
+Vertices with high betweenness centrality: 3, 6, 7
+Vertices with high closeness centrality: 0, 7, 5
+</pre>
+
+The <a href="https://www.cs.purdue.edu/homes/cs251/project4/graphtests.zip">zip file</a> includes a few sample edge-weighted digraphs named <tt>*EWD.txt</tt>.  
+You may want to construct additional test cases.
+
+<h3>Deliverables</h3>
+
+You should submit <tt>SAP.java</tt>, <tt>CriticalVertices.java</tt>, <tt>CriticalEdges.java</tt> along with any other files you created or modified, and all other files needed to compile (including classes from the book).
+
+Your code must precisely adhere to the naming and formats described here. Verify that your code correctly compiles and runs on data.cs.purdue.edu
+If there are any discrepancies or problems, we will deduct points.
+Verify that your PDF report is in the submission folder and that you can open it and read it on one of the machines in the LWSN or HAAS basement labs.
+
+<h3>Report + Readme (25 points)</h3>
+
+Submit a report (named Report.pdf) answering the following questions:
+
+<ol>
+<li>Describe in steps the algorithm you followed to determine the Shortest Ancestral Paths between two vertices.
+
+</li><li>For <tt>circlesG.txt</tt>, which edges appeared in most of the generated spanning trees? Which edges appeared in the fewest? 
+Briefly explain what makes an edge appear in a large number of minimum spanning trees.
+
+</li><li>List the clustering coefficients of all the undirected graphs given in the <a href="https://www.cs.purdue.edu/homes/cs251/project4/graphtests.zip">graphtests.zip file</a>. 
+
+</li><li>What is the overall complexity of the entire task 2 in big-Oh notation? Briefly explain why.
+
+</li><li>For <tt>circlesEWD.txt</tt>, which vertices had the highest and lowest betweenness centrality and closeness centrality? 
+Briefly explain the difference between the two centrality notions.
+
+</li><li>What is the overall complexity of the entire task 3 in big-Oh notation? Briefly explain why.
+</li></ol><h3>Submission</h3>
+       Submit your solution before Thursday April 24th 11:59 pm (note that when the time becomes 12:00 am, the date timestamp changes to the next day; please read the late policy carefully).
+
+The simple program "turnin" will be used to submit assignments in this course. <i>Please follow these instructions very carefully as any small error can make your submission invalid:</i><p>Create a folder where you will include all source code. The report <tt>Report.pdf</tt> should be included in that folder too. Finally, provide a <tt>README.txt</tt> file which includes your name, any special instructions to compile and run your code (please do NOT
+          use absolute paths), and anything you would like us to know about your program (like any errors, special conditions, etc).
+
+          </p><p>Log into (or <tt>ssh</tt> to) <tt>data.cs.purdue.edu</tt> or <tt>lore.cs.purdue.edu</tt> 
+(you can also use puTTY). Then, please follow these steps:
+            </p><ul>
+              <li>Make a directory named yourFirstName_yourLastName and copy all the files to submit there (all .java files, <tt>README.txt</tt> and <tt>Report.pdf</tt>).
+                </li><li>While in the upper level directory (e.g., if the files are in /homes/jdoe/project4/jane_doe, cd to /homes/jdoe/project4/), execute the following command (without the % which just represents the command line prompt):
+<pre>	%turnin -c cs251 -p project4 yourFirstName_yourLastName
+</pre>
+                  (e.g., <tt>turnin -c cs251 -p project4 jane_doe</tt>)
+
+                  <br>Keep in mind that old submissions are completely overwritten with new ones whenever you execute this command, and the timestamp we will use to check your submission time according to our late policy is the time of last submission (turnin does not keep track of timestamps or any contents of any earlier submissions). 
+</li><li>
+If you wish to, you can verify your submission by executing the following command:
+<pre>	%turnin -v -c cs251 -p project4
+</pre>
+                  Do not forget the <tt>-v</tt> flag here, as otherwise your submission will be completely replaced with a blank (an empty) submission and your earlier timestamp overwritten.</li></ul><p>
+</p><address><small>
+Task 1 is based on an assignment developed by Bob Sedgewick and Kevin Wayne.
+Copyright ©
+</small>
+</address><table>
+
+
+
+
+
+
+
+        
+            
+
+
+
+</table></p></body></html>
