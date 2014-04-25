@@ -55,8 +55,12 @@ public class SAP {
      * print those
      */
     public static void main(String [] args) {
+        
+        //parse command line args and get input
         In in = new In(args[0]);
         In testIn = new In(args[1]);
+
+        //find ancestors and lengths of ancestral paths
         Digraph digh = new Digraph(in);
         SAP sap = new SAP(digh);
         while(testIn.hasNextLine()) {
@@ -71,4 +75,6 @@ public class SAP {
             }
         }
     }
+
 }
+
