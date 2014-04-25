@@ -1,8 +1,15 @@
 import java.util.NoSuchElementException;
 import java.util.Collections;
+import java.util.Comparator;
 
 public class CriticalEdges {
 
+    /*
+     * for each vertex in graph:
+     *      Compute total number of adjacent vertices / total number of possible edges among vertices
+     *  The coefficient is 0 for a vertex with <= 1 adjacent vertices(no self loops).
+     *  Average this across all vertices in the graph.
+     */
     public static double getClusteringCoefficient(Graph g) {
         double clustCoeff = 0;
 
@@ -11,20 +18,13 @@ public class CriticalEdges {
 
     public static void main(String [] args) {
         In in = new In(args[0]);
-        In temp = new In(args[0]);
 
         int n = Integer.parseInt(args[1]);
-        int nVertices = in.nextInt();
-        int nEdges = in.nextInt();
+        int nVertices = in.readInt();
+        int nEdges = in.readInt();
 
-        int maxInt = -99999999;
-        for(int i = 0; i < nEdges; i++) {
-            int curr = temp.nextInt();
-            if (curr > maxInt)
-                maxInt = curr;
-        }
-
-        int [][] edgesInMST = new int[maxInt][maxInt];
+        int [][] edgesInMST = new int[nVertices][nVertices];
+        Edge[] edges = new Edge[nEdges];
 
         double weight;
         int edgesAdded = 0;
@@ -35,18 +35,26 @@ public class CriticalEdges {
          *      compute MSTs
          *  Store number of times the edge appears on the MST
          */
-        for(int i = 0; i < 50; i++) {
+        for(int i = 0; i < 50; i++) { //do 50 times
 
             EdgeWeightedGraph egraph = new EdgeWeightedGraph(nVertices);
+            In tempIn = new In(args[0]);
+            tempIn.readInt();
+            tempIn.readInt();
 
-            for(int j = 0; j < nEdges; j++) {
+            for(int j = 0; j < nEdges; j++) { //for every edge
                 weight = StdRandom.uniform();
-                Edge edge = new Edge(in.nextInt(), in.nextInt(), weight);
+                Edge edge = new Edge(tempIn.readInt(), tempIn.readInt(), weight);
+                if (edgesAdded == 0) {
+                    edges[j] = edge;
+                    edgesAdded++;
+                }
             }
 
-            KruskalMST mst = new KruskalMST(egraph);
-            for(Edge edge : mst.edges)
-                //
+            KruskalMST mst = new KruskalMST(egraph); //compute MSTs using kruskal's algorithm
+
+            for(Edge edge : mst.edges())
+                edgesInMST[edge.either()][edge.other(edge.either())]++; //compute times every edge appears in MST 
         }
 
         /* sort edges by number of times they appear on
@@ -54,23 +62,17 @@ public class CriticalEdges {
          */
         Collections.sort(edges, new Comparator<Edge>() {
             public int compare(Edge e1, Edge e2) {
-                return edgesInMST[e1.either][e1.other] - 
-            edgesInMST[e2.either][e2.other];
+                return edgesInMST[e1.either()][e1.other(e1.either())] - 
+            edgesInMST[e2.either()][e2.other(e2.either())];
             }
         });
 
         // print top N edges, by number of times they appear on MSTs
         StdOut.println("Top edges:");
         for(int i = 0; i < n; i++) {
-            StdOut.println("Edge " + edges[i].either + "-" + edges[i].other);
+            StdOut.println("Edge " + edges[i].either() + "-" + edges[i].other(edges[i].either()));
         }
-
-        /*
-         * for each vertex in graph:
-         *      Compute total number of adjacent vertices / total number of possible edges among vertices
-         *  The coefficient is 0 for a vertex with <= 1 adjacent vertices(no self loops).
-         *  Average this across all vertices in the graph.
-         */
+        
         In graphIn = new In(args[0]);
         Graph g = new Graph(graphIn);
         double clusCoeff = getClusteringCoefficient(g);
