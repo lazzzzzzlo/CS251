@@ -10,8 +10,8 @@ public class CriticalVertices {
         In temp2 = new In(args[0]);
 
         int n = Integer.parseInt(args[1]);
-        int nV = temp.nextInt();
-        int nE = temp.nextInt();
+        int nV = temp.readInt();
+        int nE = temp.readInt();
 
         /* init vertex array to their correponding
          * index
@@ -37,8 +37,8 @@ public class CriticalVertices {
                 dist += sp.distTo(j);
                 int first = 0; 
                 DirectedEdge tempEdge;
-                for(DirectedEdge de : pathTo(j)) {
-                    if (!first) {
+                for(DirectedEdge de : sp.pathTo(j)) {
+                    if (first == 0) {
                         first++;
                         continue;
                     }
@@ -70,7 +70,7 @@ public class CriticalVertices {
 
         // Sort vertices by high closeness centrality
         int [] verticesByCloseness = new int[nV];
-        int tempMin = 9999999999;
+        int tempMin = 9999999;
         for(int i = 0; i < nV; i++) {
             int j;
             for(j = 0; j < nV; j++) {

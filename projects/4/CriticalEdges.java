@@ -1,5 +1,5 @@
 import java.util.NoSuchElementException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Comparator;
 
 public class CriticalEdges {
@@ -11,9 +11,21 @@ public class CriticalEdges {
      *  Average this across all vertices in the graph.
      */
     public static double getClusteringCoefficient(Graph g) {
-        double clustCoeff = 0;
+        double totalClustCoeff = 0;
 
-        return clustCoeff;
+        for(int i = 0; i < g.V(); i++) {
+            double tempClustCoeff = 0;
+            int length = 0;
+            for(Integer j : g.adj(i))
+                length++;
+            if (length <= 1) {
+                continue;
+            }
+            tempClustCoeff = length / ((length*(length - 1))/2);
+            totalClustCoeff += tempClustCoeff;
+        }
+
+        return totalClustCoeff/g.V();
     }
 
     public static void main(String [] args) {
@@ -23,7 +35,7 @@ public class CriticalEdges {
         int nVertices = in.readInt();
         int nEdges = in.readInt();
 
-        int [][] edgesInMST = new int[nVertices][nVertices];
+        final int [][] edgesInMST = new int[nVertices][nVertices];
         Edge[] edges = new Edge[nEdges];
 
         double weight;
@@ -60,12 +72,11 @@ public class CriticalEdges {
         /* sort edges by number of times they appear on
          * MSTs
          */
-        Collections.sort(edges, new Comparator<Edge>() {
-            public int compare(Edge e1, Edge e2) {
+        Arrays.sort(edges, new Comparator<Edge>(){
+            public int compare(Edge e1, Edge e2){
                 return edgesInMST[e1.either()][e1.other(e1.either())] - 
-            edgesInMST[e2.either()][e2.other(e2.either())];
-            }
-        });
+                       edgesInMST[e2.either()][e2.other(e2.either())];
+        }});
 
         // print top N edges, by number of times they appear on MSTs
         StdOut.println("Top edges:");
