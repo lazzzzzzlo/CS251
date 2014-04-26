@@ -57,32 +57,37 @@ public class CriticalVertices {
         // Sort vertices by high betweenness centrality
         int [] verticesByBetweenness = new int[nV];
         int tempMax = -99999;
+        int maxI = -1;
         for(int i = 0; i < nV; i++) {
             int j;
             for(j = 0; j < nV; j++) {
-                if (vertices[j] > tempMax)
-                    tempMax = j;
+                if (vertices[j] > tempMax) {
+                    tempMax = vertices[j];
+                    maxI = j;
+                }
             }
-            verticesByBetweenness[i] = j;
-            vertices[j] = -99999;
+            verticesByBetweenness[i] = maxI;
+            vertices[maxI] = -99999;
             tempMax = -99999;
         }
 
         // Sort vertices by high closeness centrality
         int [] verticesByCloseness = new int[nV];
-        int tempMin = 9999999;
+        int minvDistances = 9999999;
+        int minI = -1;
         for(int i = 0; i < nV; i++) {
-            int j;
-            for(j = 0; j < nV; j++) {
-                if (vertices[j] < tempMin)
-                    tempMin = j;
+            for(int j = 0; j < nV; j++) {
+                if (vDistances[j] < minvDistances) {
+                    minI = j;
+                    minvDistances = vDistances[j];
+                }
             }
-            verticesByCloseness[i] = j;
-            vertices[j] = 9999999;
-            tempMin = 9999999;
+            verticesByCloseness[i] = minI;
+            vDistances[minI] = 9999999;
+            minvDistances = 9999999;
         }
 
-        if (n < nV)
+        if (n > nV)
             n = nV;
 
         StringBuilder sb = new StringBuilder();
